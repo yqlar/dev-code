@@ -7,18 +7,17 @@ const route = require('./route')
 const activity = require('./activity')
 
 
-const host = 'http://localhost:3001'
+const host = 'http://localhost:3000'
 // const host = 'https://wwwstage.klook.com'
 
 const cwd = path.join(os.homedir(), 'Documents/klook/klook-nuxt-web')
-const exec = cp.exec('clinic doctor -- node server/index.js', {
+const exec = cp.exec('clinic doctor --collect-only -- node server/index.js', {
     cwd: cwd,
     env: {
         NODE_ENV: 'testing',
         ...process.env
     },
-    stdio: 'inherit',
-    // shell: '/bin/zsh'
+    stdio: 'inherit'
 })
 
 exec.stdout.on('data', async (data) => {
@@ -27,11 +26,12 @@ exec.stdout.on('data', async (data) => {
         let arr = Array.from(new Set(activity.split('\n')))
         const url = host + arr[0]
 
-        console.log('-- start' )
         await autoPin(url, 5, 0.2)
 
-        console.log('-- end')
-        // exec.kill()
+        const rr = setTimeout(() => {
+            exec.kill('SIGINT')
+            clearTimeout(rr)
+        }, 5000)
     }
 })
 
