@@ -5,9 +5,46 @@ const autocannon = require('autocannon')
 const language = require('./language')
 const route = require('./route')
 const activity = require('./activity')
+const redisClient = require('./redis-client')
+const httpProxy = require('http-proxy')
 
 
-const host = 'http://localhost:3000'
+const proxy = httpProxy.createServer({
+    target: 'https://wwwstage.klook.com',
+    changeOrigin: true,
+    selfHandleResponse: true
+}).listen(10086, function () {
+    console.log('Waiting for requests...')
+})
+
+proxy.on('proxyReq', async function (proxyReq, request, response) {
+    const key = requestKey(request)
+    const cache = await redisClient.getKey(key)
+    cache && response.end(cache)
+})
+
+proxy.on('proxyRes', function (proxyRes, request, response) {
+    let body = []
+    proxyRes.on('data', (chunk) => {
+        body.push(chunk)
+    })
+
+    proxyRes.on('end', async function () {
+        const key = requestKey(request)
+        if (await redisClient.getKey(key)) {
+            body = Buffer.concat(body).toString()
+            await redisClient.setKey(key, body)
+        }
+    })
+})
+
+function requestKey(request) {
+    return request.method + request.headers['accept-language'] + request.url
+}
+
+
+/*
+const host = 'http://localhost:3001'
 // const host = 'https://wwwstage.klook.com'
 
 const cwd = path.join(os.homedir(), 'Documents/klook/klook-nuxt-web')
@@ -62,7 +99,7 @@ async function autoPin(url = '', connections = 3, durationMinute = 2) {
         connections, // default
         duration: durationMinute * 60, // default
     })
-    console.log('-- result: ', result)
+    // console.log('-- result: ', result)
 }
 
 // let i = 0
@@ -76,3 +113,4 @@ async function autoPin(url = '', connections = 3, durationMinute = 2) {
 // autoPin(0)
 
 
+*/
