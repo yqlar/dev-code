@@ -1,13 +1,13 @@
 const autocannon = require('autocannon')
 
 async function stressRequest(data) {
-    const {url = '', connections = 3, durationMinute = 2, amount = 100} = data
+    const {url = '', connections = 3, duration = 600, amount = 100} = data
     await autocannon({
-        connections,
-        amount,
         url,
+        amount,
+        duration,
+        connections,
         progress: true,
-        duration: durationMinute * 60,
     })
 }
 

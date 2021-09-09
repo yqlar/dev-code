@@ -1,62 +1,22 @@
-const cp = require('child_process')
-const path = require('path')
-const os = require('os')
-
+const childProcess = require('./child-process')
 const stressRequest = require('./autocannon')
-const language = require('./util/language')
-const route = require('./util/route')
-const activity = require('./util/activity')
+const proxy = require('./proxy')
+const config = require('./default-config')
 
+const {proxyTargetHost, proxyPort, useCache} = config
 
-const host = 'http://localhost:3001'
-// const host = 'https://wwwstage.klook.com'
-
-const cwd = path.join(os.homedir(), 'Documents/klook/klook-nuxt-web')
-const exec = cp.exec('clinic doctor --collect-only -- node server/index.js', {
-    cwd: cwd,
-    env: {
-        NODE_ENV: 'testing',
-        ...process.env
-    },
-    stdio: 'inherit'
-})
-
-exec.stdout.on('data', async (data) => {
-    console.log(`stdout: ${data}`)
-    if (data.includes('Server listening on')) {
-        let arr = Array.from(new Set(activity.split('\n')))
-        const url = host + arr[0]
-
-        await autoPin(url, 5, 0.2)
-
-        const rr = setTimeout(() => {
-            exec.kill('SIGINT')
-            clearTimeout(rr)
-        }, 5000)
-    }
-})
-
-exec.on('close', (code) => {
-    console.log(`CLOSE: ${code}`)
-})
-
-exec.on('exit', (code) => {
-    console.log(`EXIT: ${code}`)
+proxy({
+    useCache,
+    proxyPort,
+    target: proxyTargetHost
 })
 
 
+childProcess(async () => {
+    await stressRequest()
+})
 
-async function autoPin(data) {
-const {url = '', connections = 3, durationMinute = 2, amount = 100} = data
-    await autocannon({
-        connections,
-        amount,
-        url,
-        progress: true,
-        duration: durationMinute * 60,
-    })
-}
-
+console.log('-- childProcess: ', childProcess)
 
 // const links = language.reduce((acc, la) => {
 //     const a = route.map(item => {
