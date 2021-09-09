@@ -31,10 +31,6 @@ async function startChildProcess() {
         NODE_ENV: 'testing',
     }, command)
 
-    exec.on('close', (code) => {
-        console.log(`--- child process close: ${code}`)
-    })
-
     exec.on('exit', (code) => {
         console.log(`--- child process exit: ${code}`)
     })
@@ -49,13 +45,13 @@ async function startChildProcess() {
 }
 
 function closeChildProcess(exec) {
-    const beforeCloseWait = 15000
+    const beforeCloseWait = 60000
 
     return new Promise((resolve) => {
         const tt = setTimeout(() => {
             exec.kill('SIGINT')
-            resolve()
             clearTimeout(tt)
+            resolve()
         }, beforeCloseWait)
     })
 }

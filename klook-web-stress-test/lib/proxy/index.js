@@ -1,5 +1,5 @@
 const httpProxy = require('http-proxy')
-const redisClient = require('../util/redis-client')
+const redisClient = require('../../util/redis-client')
 
 function requestKey(request) {
     return request.method + request.headers['accept-language'] + request.url
@@ -11,13 +11,16 @@ function initProxy(data = {
     useCache: true,
 }) {
     const {proxyPort = 10086, target = 'https://wwwstage.klook.com', useCache = true} = data
+    console.log('-- initProxy: ', data)
     const selfHandleResponse = useCache
     const proxy = httpProxy.createServer({
         target,
         changeOrigin: true,
         selfHandleResponse,
+        timeout: 6000,
+        proxyTimeout: 6000
     }).listen(proxyPort, function () {
-        console.log('Waiting for requests...')
+        console.log('--- Waiting for requests...')
     })
     return proxy
 }
@@ -25,7 +28,6 @@ function initProxy(data = {
 function proxyWatcher(proxy, useCache) {
     // request 发送
     proxy.on('proxyReq', async function (proxyReq, request, response) {
-        const key = requestKey(request)
         if (useCache) {
             const key = requestKey(request)
             const cache = await redisClient.getKey(key)

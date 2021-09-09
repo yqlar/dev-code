@@ -1,6 +1,6 @@
-const childProcess = require('./child-process')
-const stressRequest = require('./autocannon')
-const proxy = require('./proxy')
+const childProcess = require('./lib/child-process')
+const stressRequest = require('./lib/autocannon')
+const proxy = require('./lib/proxy')
 const config = require('./default-config')
 
 const {proxyTargetHost, proxyPort, useCache, testList} = config
@@ -17,6 +17,8 @@ async function stressTest(i) {
 
         await childProcess.closeChildProcess(exec)
         await stressTest(i + 1)
+    } else {
+        console.log('--- stressTest end: ', )
     }
 }
 
@@ -30,12 +32,10 @@ async function __main() {
     proxy.proxyWatcher(devProxy, useCache)
 
     let i = 0
-    const tt = setTimeout(async () => {
-        await stressTest(i)
-        proxy.close(devProxy)
-        clearTimeout(tt)
-    }, 2000)
+    await stressTest(i)
 
+    console.log('--- proxy.close: ', )
+    proxy.close(devProxy)
 }
 
-await __main()
+__main()
