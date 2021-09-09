@@ -25,6 +25,7 @@ function initProxy(data = {
 function proxyWatcher(proxy, useCache) {
     // request 发送
     proxy.on('proxyReq', async function (proxyReq, request, response) {
+        const key = requestKey(request)
         if (useCache) {
             const key = requestKey(request)
             const cache = await redisClient.getKey(key)
@@ -58,7 +59,13 @@ function proxyWatcher(proxy, useCache) {
     })
 }
 
+function close(proxy) {
+    redisClient.close()
+    proxy.close()
+}
+
 module.exports = {
     initProxy,
-    proxyWatcher
+    proxyWatcher,
+    close,
 }

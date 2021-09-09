@@ -6,16 +6,22 @@ const config = require('./default-config')
 const {proxyTargetHost, proxyPort, useCache, testList} = config
 
 async function stressTest(i) {
-    if (testList[i]) {
-        await childProcess(async () => {
-            await stressRequest()
+    const testConfig = testList[i]
+    if (testConfig) {
+        const exec = await childProcess.startChildProcess()
+
+        await stressRequest({
+            url: testConfig.url,
+            ...testConfig.autoCannon,
         })
+
+        await childProcess.closeChildProcess(exec)
         await stressTest(i + 1)
     }
 }
 
 async function __main() {
-    const devProxy = proxy.initProxy({
+    const devProxy = await proxy.initProxy({
         useCache,
         proxyPort,
         target: proxyTargetHost,
@@ -24,12 +30,15 @@ async function __main() {
     proxy.proxyWatcher(devProxy, useCache)
 
     let i = 0
-    await stressTest(i)
+    const tt = setTimeout(async () => {
+        await stressTest(i)
+        proxy.close(devProxy)
+        clearTimeout(tt)
+    }, 2000)
 
-    devProxy.close()
 }
 
-__main()
+await __main()
 
 // const os = require('os')
 // const activity = require('../util/activity')

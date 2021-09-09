@@ -37,8 +37,12 @@ async function getKey(key) {
     })
 }
 
+function close() {
+    redisClient.end(true)
+}
 
 module.exports = {
     setKey,
     getKey,
+    close,
 }

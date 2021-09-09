@@ -23,28 +23,13 @@ function createdProcess(
     return exec
 }
 
-
-function childProcess(callback) {
+async function startChildProcess() {
     const path = '/Users/klook/Documents/klook/klook-nuxt-web'
     const command = 'node server/index.js'
 
     const exec = createdProcess(path, {
         NODE_ENV: 'testing',
     }, command)
-
-    exec.stdout.on('data', async (data) => {
-        if (data.includes('Server listening on')) {
-            await callback()
-
-            return new Promise((resolve) => {
-                const rr = setTimeout(() => {
-                    exec.kill('SIGINT')
-                    clearTimeout(rr)
-                    resolve()
-                }, 5000)
-            })
-        }
-    })
 
     exec.on('close', (code) => {
         console.log(`--- child process close: ${code}`)
@@ -53,6 +38,29 @@ function childProcess(callback) {
     exec.on('exit', (code) => {
         console.log(`--- child process exit: ${code}`)
     })
+
+    return new Promise((resolve) => {
+        exec.stdout.on('data', async (data) => {
+            if (data.includes('Server listening on')) {
+                resolve(exec)
+            }
+        })
+    })
 }
 
-module.exports = childProcess
+function closeChildProcess(exec) {
+    const beforeCloseWait = 15000
+
+    return new Promise((resolve) => {
+        const tt = setTimeout(() => {
+            exec.kill('SIGINT')
+            resolve()
+            clearTimeout(tt)
+        }, beforeCloseWait)
+    })
+}
+
+module.exports = {
+    startChildProcess,
+    closeChildProcess,
+}

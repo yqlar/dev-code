@@ -9,11 +9,11 @@ const config = {
             autoCannon: {
                 title: 'ActivityPage',
                 connections: 3,
-                duration: 3,
-                amount: 100,
-            }
-        }
-    ]
+                duration: 10,
+                // amount: 100,
+            },
+        },
+    ],
 }
 
 module.exports = config
