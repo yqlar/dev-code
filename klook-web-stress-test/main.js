@@ -3,21 +3,41 @@ const stressRequest = require('./autocannon')
 const proxy = require('./proxy')
 const config = require('./default-config')
 
-const {proxyTargetHost, proxyPort, useCache} = config
+const {proxyTargetHost, proxyPort, useCache, testList} = config
 
-proxy({
-    useCache,
-    proxyPort,
-    target: proxyTargetHost
-})
+async function stressTest(i) {
+    if (testList[i]) {
+        await childProcess(async () => {
+            await stressRequest()
+        })
+        await stressTest(i + 1)
+    }
+}
 
+async function __main() {
+    const devProxy = proxy.initProxy({
+        useCache,
+        proxyPort,
+        target: proxyTargetHost,
+    })
 
-childProcess(async () => {
-    await stressRequest()
-})
+    proxy.proxyWatcher(devProxy, useCache)
 
-console.log('-- childProcess: ', childProcess)
+    let i = 0
+    await stressTest(i)
 
+    devProxy.close()
+}
+
+__main()
+
+// const os = require('os')
+// const activity = require('../util/activity')
+//
+//
+// const host = 'http://localhost:3001'
+// let arr = Array.from(new Set(activity.split('\n')))
+// const url = host + arr[0]
 // const links = language.reduce((acc, la) => {
 //     const a = route.map(item => {
 //         return la ? '/' + la + item : item

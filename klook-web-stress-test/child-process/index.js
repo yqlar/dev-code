@@ -1,12 +1,6 @@
 const cp = require('child_process')
 const path = require('path')
-const os = require('os')
-const activity = require('../util/activity')
 
-
-const host = 'http://localhost:3001'
-let arr = Array.from(new Set(activity.split('\n')))
-const url = host + arr[0]
 function createdProcess(
     projectAbsolutPath,
     env = {
@@ -42,10 +36,13 @@ function childProcess(callback) {
         if (data.includes('Server listening on')) {
             await callback()
 
-            const rr = setTimeout(() => {
-                exec.kill('SIGINT')
-                clearTimeout(rr)
-            }, 5000)
+            return new Promise((resolve) => {
+                const rr = setTimeout(() => {
+                    exec.kill('SIGINT')
+                    clearTimeout(rr)
+                    resolve()
+                }, 5000)
+            })
         }
     })
 
