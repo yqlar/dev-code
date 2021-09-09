@@ -1,8 +1,8 @@
-let redis = require('redis'),
-    client = redis.createClient()
+const redis = require('redis')
+const client = redis.createClient()
 
 client.on('error', function (err) {
-    console.log('Error ' + err)
+    console.log('--- Redis Client Error: ' + err)
 })
 
 async function setKey(key, value) {
@@ -28,12 +28,6 @@ async function getKey(key) {
         })
     })
 }
-//
-// (async function () {
-//     await setKey('test', JSON.stringify({a: 1}))
-//     const a = await getKey('test')
-//     console.log('-- a: ', a)
-// }())
 
 module.exports = {
     setKey, getKey,
