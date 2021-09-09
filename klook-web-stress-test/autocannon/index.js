@@ -4,6 +4,7 @@ async function stressRequest(data) {
     console.log('-- stressRequest: ', data)
     await autocannon({
         ...data,
+        warmup: '[ -c 1 -d 3 ]',
     })
 }
 
