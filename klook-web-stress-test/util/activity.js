@@ -898,3 +898,36 @@ module.exports = `/zh-TW/activity/17290-beitou-yangmingshan-tour-taipei/
 /zh-HK/activity/45608-exclusive-four-seasons-hotel-hong-kong-overnight-staycation-breakfast--2-persons/
 /zh-HK/activity/45436-park-lane-hong-kong-a-pullman-hotel/
 `
+
+
+
+// const os = require('os')
+// const activity = require('../util/activity')
+//
+//
+// const host = 'http://localhost:3001'
+// let arr = Array.from(new Set(activity.split('\n')))
+// const url = host + arr[0]
+// const links = language.reduce((acc, la) => {
+//     const a = route.map(item => {
+//         return la ? '/' + la + item : item
+//     })
+//     return [...acc, ...a]
+// }, [])
+//
+//
+// arr = [...links, ...arr ].map((item) => {
+//     return host + item
+// })
+
+// let i = 0
+
+// i += 1
+// if (i < 400) {
+//     const random = Math.floor(Math.random()*2179+1)
+//     await autoPin(url)
+// }
+
+// autoPin(0)
+
+
