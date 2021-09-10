@@ -3,12 +3,20 @@ const stressRequest = require('./lib/autocannon')
 const proxy = require('./lib/proxy')
 const config = require('./default-config')
 
-const {proxyTargetHost, proxyPort, useCache, testList} = config
+const {
+    proxyTargetHost,
+    proxyPort,
+    useCache,
+    testList,
+    projectAbsolutPath,
+    runNodeCommand,
+    env,
+} = config
 
 async function stressTest(i) {
     const testConfig = testList[i]
     if (testConfig) {
-        const exec = await childProcess.startChildProcess()
+        const exec = await childProcess.startChildProcess(projectAbsolutPath, runNodeCommand, env)
 
         await stressRequest({
             url: testConfig.url,
@@ -18,7 +26,7 @@ async function stressTest(i) {
         await childProcess.closeChildProcess(exec)
         await stressTest(i + 1)
     } else {
-        console.log('--- stressTest end: ', )
+        console.log('--- stressTest end ')
     }
 }
 
@@ -34,7 +42,6 @@ async function __main() {
     let i = 0
     await stressTest(i)
 
-    console.log('--- proxy.close: ', )
     proxy.close(devProxy)
 }
 

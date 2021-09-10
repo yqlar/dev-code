@@ -64,6 +64,7 @@ function proxyWatcher(proxy, useCache) {
 function close(proxy) {
     redisClient.close()
     proxy.close()
+    console.log('--- proxy close', )
 }
 
 module.exports = {

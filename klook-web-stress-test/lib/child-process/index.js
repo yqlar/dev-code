@@ -3,10 +3,10 @@ const path = require('path')
 
 function createdProcess(
     projectAbsolutPath,
+    command = 'node server/index.js',
     env = {
         NODE_ENV: 'testing',
     },
-    command = 'node server/index.js',
 ) {
     const cwd = path.join(projectAbsolutPath)
     // const cwd = path.join(os.homedir(), 'Documents/klook/klook-nuxt-web')
@@ -23,13 +23,9 @@ function createdProcess(
     return exec
 }
 
-async function startChildProcess() {
-    const path = '/Users/klook/Documents/klook/klook-nuxt-web'
-    const command = 'node server/index.js'
+async function startChildProcess(path, command, env) {
 
-    const exec = createdProcess(path, {
-        NODE_ENV: 'testing',
-    }, command)
+    const exec = createdProcess(path, command, env)
 
     exec.on('exit', (code) => {
         console.log(`--- child process exit: ${code}`)
