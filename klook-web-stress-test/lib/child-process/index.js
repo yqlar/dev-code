@@ -13,9 +13,11 @@ function createdProcess(
 
     const exec = cp.exec(`clinic doctor --collect-only -- ${command}`, {
         cwd: cwd,
+
         env: {
-            ...env,
             ...process.env,
+            ...env,
+            NODE_OPTIONS: '--max-old-space-size=4096'
         },
         stdio: 'inherit',
     })
@@ -33,8 +35,12 @@ async function startChildProcess(path, command, env) {
 
     return new Promise((resolve) => {
         exec.stdout.on('data', async (data) => {
+            // console.log('-- data: ', data)
             if (data.includes('Server listening on')) {
-                resolve(exec)
+                const tt = setTimeout(() => {
+                    resolve(exec)
+                    clearTimeout(tt)
+                }, 60000)
             }
         })
     })

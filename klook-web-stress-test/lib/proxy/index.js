@@ -25,11 +25,17 @@ function initProxy(data = {
     return proxy
 }
 
+
+let i = 0
 function proxyWatcher(proxy, useCache) {
     // request 发送
     proxy.on('proxyReq', async function (proxyReq, request, response) {
         if (useCache) {
             const key = requestKey(request)
+            if (key.includes('/v1/experiencesrv/activity/component_service/detail')) {
+                i += 1
+                console.log('-- i: ', i)
+            }
             const cache = await redisClient.getKey(key)
 
             if (cache) {

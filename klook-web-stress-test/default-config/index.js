@@ -15,7 +15,7 @@ const config = {
                 title: 'ActivityPage',
                 connections: 3,
                 // duration: 10,
-                amount: 100,
+                amount: 800,
             },
         },
         // {
