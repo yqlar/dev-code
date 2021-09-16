@@ -11,6 +11,7 @@ const config = {
     testList: [
         {
             url: 'http://0.0.0.0:3001/en-US/activity/39-hong-kong-disneyland-resort-hong-kong/',
+            step: 200, // 将时间或者总数，分段跑
             autoCannon: {
                 title: 'ActivityPage',
                 connections: 3,

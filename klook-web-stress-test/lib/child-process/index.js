@@ -40,7 +40,7 @@ async function startChildProcess(path, command, env) {
                 const tt = setTimeout(() => {
                     resolve(exec)
                     clearTimeout(tt)
-                }, 60000)
+                }, 10000)
             }
         })
     })
